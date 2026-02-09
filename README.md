@@ -1,36 +1,164 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧠 Internal AI Tools Dashboard
 
-## Getting Started
+A secure internal dashboard built with **Next.js App Router (v16)** for managing and launching internal AI tools.  
+Features include:
 
-First, run the development server:
+*   Password‑protected **Settings** area
+*   Add / Edit / Delete tool entries
+*   Beautiful **Home** page with card grid
+*   Header‑less admin area
+*   Optional persistence with **Vercel KV**
+*   Fully server‑rendered, safe, and cleanly structured with **Route Groups**
+
+***
+
+## 🚀 Getting Started (Development)
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+➡️ **<http://localhost:3000>**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+***
 
-## Learn More
+## 🔐 Authentication (Admin Mode)
 
-To learn more about Next.js, take a look at the following resources:
+The admin section lives at:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    /internalaitools/settings
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The first time you visit, you will be redirected to:
 
-## Deploy on Vercel
+    /admin/login
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set your admin password in your **`.env.local`**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+ADMIN_PASSWORD=your-secret-here
+```
+
+After logging in, you can:
+
+✔ Add Tools  
+✔ Edit Tools  
+✔ Delete Tools  
+✔ Logout (clears admin session cookie)
+
+Admin auth uses an **HttpOnly cookie**:
+
+    admin=1
+
+***
+
+## 📁 Project Structure
+
+Your app uses **Next.js Route Groups**:
+
+    app/
+     ├─ layout.tsx                     # Root layout, wraps entire app (html/body required)
+     │
+     ├─ (site)/                        # Public area (header enabled)
+     │    ├─ layout.tsx                # Includes Header + container
+     │    └─ page.tsx                  # Home page (“/”)
+     │
+     ├─ (site)/admin/login/page.tsx    # Login page
+     │
+     ├─ (settings)/                    # Admin area (no header)
+     │    └─ internalaitools/settings/
+     │         ├─ layout.tsx           # Headerless layout
+     │         └─ page.tsx             # Settings dashboard
+     │
+     └─ api/
+          ├─ auth/login/route.ts       # Login (sets admin cookie)
+          ├─ auth/logout/route.ts      # Logout (clears cookie)
+          ├─ apps/route.ts             # GET + POST Tools
+          └─ apps/[id]/route.ts        # PUT + DELETE Tools
+
+***
+
+## 🗃 Storage (Local + Optional Vercel KV)
+
+By default (local development), the app uses an **in‑memory global store** so data persists across HMR but resets when the server restarts.
+
+To enable **persistent cloud storage**, set these in your Vercel project:
+
+```env
+KV_REST_API_URL=...
+KV_REST_API_TOKEN=...
+```
+
+When these variables exist, the app automatically uses **Vercel KV** (no code changes required).
+
+***
+
+## 🖥 Home Page
+
+`/` shows all published internal tools:
+
+*   Tool name
+*   README link
+*   App link
+*   Thumbnail
+*   Styled card grid
+*   Smooth hover animations, modern dark UI
+
+All tools come from the shared data store (`listApps()`).
+
+***
+
+## 🔧 Settings Page (Admin Only)
+
+`/internalaitools/settings` includes:
+
+*   Add Tool form
+*   Edit Tool in a modal/card
+*   Delete with confirmation
+*   Full table layout
+*   Auto refresh after mutations
+*   Logout button
+
+Admin is required for any **POST / PUT / DELETE** operations.
+
+***
+
+## 🧱 Tech Stack
+
+*   **Next.js 16 (App Router + Route Groups)**
+*   **React Server Components**
+*   **Next.js Route Handlers** for API (`route.ts`)
+*   **HttpOnly cookie-based auth**
+*   **Modern dark theme UI with custom CSS**
+*   Optional **Vercel KV** for persistence
+
+***
+
+## 🛠 Environment Variables
+
+Create `.env.local`:
+
+```env
+ADMIN_PASSWORD=your-password
+KV_REST_API_URL=        # optional
+KV_REST_API_TOKEN=      # optional
+```
+
+***
+
+
+## 📄 License
+
+This is an internal/private tool.  
+
+
+
