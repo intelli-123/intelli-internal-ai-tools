@@ -6,14 +6,15 @@ export default async function Home() {
   const apps = await listApps();
 
   return (
-    <>
+    // Wrap the entire page content in a div and apply the background color to simulate body background
+    <div style={{ backgroundColor: '#111111', minHeight: '100vh' }}> {/* Added background color for the overall page content and minHeight */}
       {/* Hero / Intro */}
-      <section className="hero">
-        <div className="hero__content" style={{ textAlign: 'center' }}> {/* Added text-align: center */}
-          <h1 className="hero__title" style={{ color: '#2563EB' }}> {/* Example: Blue color */}
+      <section className="hero"> {/* Retaining the hero's specific background color from previous step */}
+        <div className="hero__content" style={{ textAlign: 'center' }}>
+          <h1 className="hero__title" style={{ color: '#eceff4' }}>
             Intelli-Internal-AI-Tools
           </h1>
-          <p className="hero__subtitle" style={{ color: '#6B7280' }}> {/* Example: Gray color */}
+          <p className="hero__subtitle" style={{ color: '#6c605c' }}>
             Your internal launchpad for AI utilities, prototypes, and internal docs — organized and accessible.
           </p>
           <div className="hero__cta">
@@ -25,10 +26,10 @@ export default async function Home() {
 
       {/* Cards Grid (uses the same .card/.thumb styling as Settings) */}
       <section className="section">
-        <h2 className="section__title">Available Tools</h2>
+        <h2 className="section__title" style={{ color: '#dfe0e3' }}>Available Tools</h2>
 
         {apps.length === 0 ? (
-          <p className="section__muted">
+          <p className="section__muted" style={{ color: '#6c605c' }}>
             No apps yet.
           </p>
         ) : (
@@ -41,6 +42,6 @@ export default async function Home() {
           </div>
         )}
       </section>
-    </>
+    </div>
   );
 }
