@@ -1,17 +1,19 @@
 // app/(site)/admin/login/page.tsx
-export const dynamic = 'force-dynamic'; // Render at request time; no static prerender
+export const dynamic = 'force-dynamic'; 
 
 import LoginClient from './LoginClient';
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
-export default function AdminLoginPage({
+export default async function AdminLoginPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  // Read ?next=… on the server (no client hook needed)
-  const nextParam = searchParams?.next;
+  
+  const resolvedSearchParams = (await searchParams) as SearchParams;
+
+  const nextParam = resolvedSearchParams?.next; 
   const next =
     typeof nextParam === 'string' && nextParam.trim()
       ? nextParam
