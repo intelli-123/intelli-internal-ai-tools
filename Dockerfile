@@ -4,9 +4,9 @@ FROM node:20-slim
 # Create app dir
 WORKDIR /app
 
-# Install deps exactly as locked
 COPY package*.json ./
-RUN npm ci --no-audit --no-fund
+
+RUN npm install --no-audit --no-fund
 
 # Copy source and build
 COPY . .
