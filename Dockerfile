@@ -6,7 +6,8 @@ RUN npm ci --no-audit --no-fund
 
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+
+RUN npm run build:webpack
 
 ENV NODE_ENV=production
 ENV PORT=3100
