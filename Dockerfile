@@ -10,7 +10,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 ENV NODE_ENV=production
-ENV PORT=3100
+
 EXPOSE 3100
 
-CMD ["npm", "run", "start", "--", "-p", "${PORT}"]
+CMD ["npm", "run", "start"]
