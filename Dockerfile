@@ -1,45 +1,24 @@
-# ---------- 1) Dependencies layer ----------
-FROM node:20-slim AS deps
+# ---- Single-stage (normal) Dockerfile ----
+FROM node:20-slim
+
+# Create app dir
 WORKDIR /app
 
-# Ensure predictable, fast installs
+# Install deps exactly as locked
 COPY package*.json ./
 RUN npm ci --no-audit --no-fund
 
-# ---------- 2) Build layer ----------
-FROM node:20-slim AS builder
-WORKDIR /app
-
+# Copy source and build
+COPY . .
 # Helpful in CI; silences telemetry prompts
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
 
-# Copy deps and source
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# --- Diagnostics before building ---
-RUN node -v && npm -v
-# If you want even more logs, add: ENV NODE_OPTIONS="--trace-warnings"
-
-# Build (verbose to surface the real error in the CI logs)
-# NOTE: Next.js doesn't have a --verbose flag, but npm does; this makes npm show more context.
-RUN npm run build --loglevel verbose
-
-# ---------- 3) Runtime layer (Cloud Run) ----------
-FROM node:20-slim AS runner
-WORKDIR /app
-
-# Copy only what's needed to run the production server
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.* ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-
-# Defaults for local runs; Cloud Run injects PORT at runtime (often 8080)
+# Runtime config
 ENV NODE_ENV=production
+# Local default (Cloud Run will inject $PORT at runtime; we’ll bind to that)
 ENV PORT=3100
 EXPOSE 3100
 
-# Start Next.js production server bound to $PORT
+# Start Next.js prod server bound to $PORT
 CMD ["sh", "-c", "npx next start -p ${PORT}"]
