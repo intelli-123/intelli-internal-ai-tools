@@ -1,20 +1,12 @@
 # --- Build Stage ---
-FROM node:20-slim as builder
 
-# Install system dependencies required for native Node.js modules during build
-# and essential runtime libraries like libstdc++6 and libssl-dev.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    pkg-config \
-    python3 \
-    libstdc++6 \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+FROM node:20 as builder
 
+
+# available or their dependencies are covered in the full 'node:20' image.
 WORKDIR /app
 
 # Copy package files and install dependencies
-# 'npm install' is used to better handle platform-specific native modules.
 COPY package*.json ./
 RUN npm install --no-audit --no-fund
 
@@ -23,13 +15,23 @@ COPY . .
 
 # Disable Next.js telemetry prompts during build
 ENV NEXT_TELEMETRY_DISABLED=1
+
 # Build the Next.js application for production
 RUN npm run build
 
 # --- Production Stage ---
+
+    
 FROM node:20-slim
 
 WORKDIR /app
+
+# Install only essential runtime dependencies if any are missing from 'slim'
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set runtime environment variables for production
 ENV NODE_ENV=production
