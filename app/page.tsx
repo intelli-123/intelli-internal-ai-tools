@@ -12,7 +12,7 @@ export default async function Home() {
       {/* Hero / Intro */}
       <section className="hero"> {/* Retaining the hero's specific background color from previous step */}
         <div className="hero__content" style={{ textAlign: 'center' }}>
-          <h1 className="hero__title" style={{ color: '#02235d' }}>
+          <h1 className="hero__title" style={{ color: '#f5f7f9' }}>
             Intelli-Internal-AI-Tools
           </h1>
           <p className="hero__subtitle" style={{ color: '#6c605c' }}>
