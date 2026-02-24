@@ -1,0 +1,19 @@
+# Build output
+.next
+out
+
+# Dependency caches
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+
+# VCS & OS junk
+.git
+.gitignore
+.DS_Store
+
+# Local env
+.env
+.env.*
+!.env.example
