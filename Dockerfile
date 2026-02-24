@@ -1,22 +1,22 @@
+# 1. Use an official lightweight Node.js image
 FROM node:20-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    pkg-config \
-    python3 \
-    && rm -rf /var/lib/apt/lists/*
-
+# 2. Set the working directory inside the container
 WORKDIR /app
 
+# 3. Copy package files first (better caching)
 COPY package*.json ./
-RUN npm install --no-audit --no-fund
 
+# 4. Install dependencies
+RUN npm ci
+
+# 5. Copy the rest of the application code
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
 
+# 6. Expose the port the app runs on
 ENV NODE_ENV=production
 ENV PORT=3100
 EXPOSE 3100
 
-CMD ["sh", "-c", "npx next start -p ${PORT}"]
+# 7. Define the command to run the app
+CMD ["npm", "run", "start"]
