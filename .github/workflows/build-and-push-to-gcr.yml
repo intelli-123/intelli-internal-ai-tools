@@ -106,7 +106,7 @@ jobs:
           set -euo pipefail
           IMAGE_REF="${GCR_HOST}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${TAG}"
           echo "Building ${IMAGE_REF} ..."
-          docker build -t --no-cache "${IMAGE_REF}" .
+          docker build -t "${IMAGE_REF}" --no-cache .
           echo "Pushing ${IMAGE_REF} ..."
           docker push "${IMAGE_REF}"
           echo "pushed=${IMAGE_REF}" >> $GITHUB_OUTPUT
