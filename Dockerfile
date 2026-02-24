@@ -1,49 +1,24 @@
-# --- Build Stage ---
-
-FROM node:20 as builder
-
-
-# available or their dependencies are covered in the full 'node:20' image.
-WORKDIR /app
-
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install --no-audit --no-fund
-
-# Copy the rest of the application code
-COPY . .
-
-# Disable Next.js telemetry prompts during build
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# Build the Next.js application for production
-RUN npm run build
-
-# --- Production Stage ---
-
-    
+# ---- Next.js production image for Cloud Run ----
 FROM node:20-slim
 
+# 1) App dir
 WORKDIR /app
 
-# Install only essential runtime dependencies if any are missing from 'slim'
+# 2) Install deps exactly as locked
+COPY package*.json ./
+RUN npm ci --no-audit --no-fund
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    libssl3 \
-    && rm -rf /var/lib/apt/lists/*
+# 3) Copy source and build
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
 
-# Set runtime environment variables for production
+# 4) Runtime config: Cloud Run injects PORT at runtime (often 8080)
+#    We'll default to 3100 for local runs; Cloud Run overrides it.
 ENV NODE_ENV=production
 ENV PORT=3100
-
-# Copy only the necessary files from the build stage to keep the final image small
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-
 EXPOSE 3100
 
-# Start the Next.js production server
-CMD ["npm", "run", "start"]
+# 5) Start the Next.js production server bound to $PORT
+#    (equivalent to `next start -p $PORT`)
+CMD ["npm", "run", "start", "--", "-p", "${PORT}"]
